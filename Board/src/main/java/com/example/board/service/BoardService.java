@@ -28,7 +28,7 @@ public class BoardService {
 
 	// 게시판 만들기
 	@Transactional
-	public Long savePost(Long userId, BoardFormDto boardFormDto) {
+	public Long saveBoard(Long userId, BoardFormDto boardFormDto) {
 		User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 		Board board = Board.builder()
 			.title(boardFormDto.getTitle())
@@ -56,24 +56,28 @@ public class BoardService {
 	// 한건 게시판 검색
 	public ResponseBoardDto findBoardById(Long id) {
 		Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("게시판을 찾을 수 없습니다."));
-		return new ResponseBoardDto(board.getId(), board.getTitle(), board.getTitle());
+		return new ResponseBoardDto(board.getId(), board.getTitle(), board.getContent());
 	}
 
 
 	// 게시판 수정
 	@Transactional
-	public Long updateBoard(Long id, BoardFormDto boardFormDto) {
-		Board board = boardRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("게시판을 찾을 수 없습니다."));
-		board.update(boardFormDto.getTitle(), boardFormDto.getContent());
-		return id;
+	public Long updateBoard(Long boardId, Long userId, BoardFormDto boardFormDto) {
+		Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판을 찾을 수 없습니다."));
+		if(board.getUser().getId().equals(userId)) board.update(boardFormDto.getTitle(), boardFormDto.getContent());
+		return boardId;
 	}
 
 
 	// 게시판 삭제
 	@Transactional
-	public void deleteBoard(Long id) {
-		boardRepository.deleteById(id);
-
+	public boolean deleteBoard(Long boardId, Long userId) {
+		Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판을 찾을 수 없습니다."));
+		if(board.getUser().getId().equals(userId)) {
+			boardRepository.deleteById(boardId);
+			return true;
+		}
+		else return false;
 	}
 
 }
