@@ -1,6 +1,5 @@
 package com.example.board.dto;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
 
