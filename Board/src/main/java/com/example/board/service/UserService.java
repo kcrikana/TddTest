@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserService {
 
+	// security 추가
 	private final UserRepository userRepository;
 
 	@Transactional
