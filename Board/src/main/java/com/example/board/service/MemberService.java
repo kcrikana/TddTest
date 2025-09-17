@@ -26,6 +26,7 @@ public class MemberService {
 			.email(memberDto.getEmail())
 			.password(memberDto.getPassword())
 			.tel(memberDto.getTel())
+			.adress(memberDto.getAdress())
 			.build();
 		memberRepository.save(member);
 		return member.getId();
@@ -38,6 +39,7 @@ public class MemberService {
 			.name(member.getName())
 			.email(member.getEmail())
 			.tel(member.getTel())
+			.adress(member.getAdress())
 			.build();
 		return responseMemberDto;
 	}

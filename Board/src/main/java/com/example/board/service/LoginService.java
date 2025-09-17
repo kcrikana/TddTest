@@ -1,6 +1,7 @@
 package com.example.board.service;
 
 import com.example.board.domain.Member;
+import com.example.board.domain.Role;
 import com.example.board.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class LoginService implements UserDetailsService {
 		return User.builder()
 			.username(member.getName())
 			.password(member.getPassword())
+			.roles(member.getRole().name())
 			.build();
 	}
 
