@@ -1,13 +1,12 @@
 package com.example.board.dto;
 
-import com.example.board.domain.User;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
 
 
 @Getter
-public class UserDto {
+public class MemberDto {
 
 	@NotEmpty(message = "이메일을 입력해주세요.")
 	private final String email;
@@ -20,7 +19,7 @@ public class UserDto {
 
 
 	@Builder
-	public UserDto(String email, String password, String name, String tel) {
+	public MemberDto(String email, String password, String name, String tel) {
 		this.email = email;
 		this.password = password;
 		this.name = name;

@@ -1,14 +1,10 @@
 package com.example.board.controller;
 
 
-import com.example.board.domain.User;
-import com.example.board.dto.ResponseUserDto;
-import com.example.board.dto.UserDto;
-import com.example.board.service.UserService;
+import com.example.board.dto.ResponseMemberDto;
+import com.example.board.dto.MemberDto;
+import com.example.board.service.MemberService;
 import java.nio.charset.Charset;
-import java.util.List;
-import java.util.Optional;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -18,33 +14,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class UserController {
+public class MemberController {
 
-	private final UserService userService;
+	private final MemberService memberService;
 
-	@PostMapping("/joinUser")
-	public ResponseEntity<Object> joinUser(@RequestBody UserDto userDto) {
-		userService.join(userDto);
+	@PostMapping("/joinMember")
+	public ResponseEntity<Object> joinMember(@RequestBody MemberDto memberDto) {
+		memberService.join(memberDto);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
 		return new ResponseEntity<>(headers, HttpStatus.CREATED);
 	}
 
-	@GetMapping("/searchUser/{userId}")
-	public ResponseEntity<ResponseUserDto> findUser(@PathVariable Long id) {
-		ResponseUserDto responseUserDto = userService.findUserById(id);
+	@GetMapping("/searchMember/{memberId}")
+	public ResponseEntity<ResponseMemberDto> findMember(@PathVariable Long id) {
+		ResponseMemberDto responseMemberDto = memberService.findMemberById(id);
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-		return new ResponseEntity<>(responseUserDto, headers, HttpStatus.OK);
+		return new ResponseEntity<>(responseMemberDto, headers, HttpStatus.OK);
 
 	}
-
-
-
 
 }

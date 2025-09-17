@@ -31,14 +31,14 @@ public class Board extends BaseEntity{
 	private String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "USER_ID")
-	private User user;
+	@JoinColumn(name = "MEMBER_ID")
+	private Member member;
 
 	@Builder
-	public Board(String title, String content, User user) {
+	public Board(String title, String content, Member member) {
 		this.title = title;
 		this.content = content;
-		this.user = user;
+		this.member = member;
 	}
 
 	public void update(String title, String content) {
