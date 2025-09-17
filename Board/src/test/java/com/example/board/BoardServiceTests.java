@@ -1,14 +1,11 @@
 package com.example.board;
 
 
-import com.example.board.domain.Board;
-import com.example.board.domain.User;
 import com.example.board.dto.BoardFormDto;
 import com.example.board.dto.ResponseBoardDto;
-import com.example.board.dto.ResponseUserDto;
 import com.example.board.repository.BoardRepository;
 import com.example.board.service.BoardService;
-import com.example.board.service.UserService;
+import com.example.board.service.MemberService;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -23,7 +20,7 @@ public class BoardServiceTests {
 	private BoardService boardService;
 
 	@Autowired
-	private UserService userService;
+	private MemberService memberService;
 
 	@Autowired
 	private BoardRepository boardRepository;
@@ -87,13 +84,13 @@ public class BoardServiceTests {
 		// 유저 아이디 일치 시에만 변경
 		
 		// given
-		Long userId = 1L;
+		Long memberId = 1L;
 		Long boardId = 4L;
 		BoardFormDto boardFormDto = new BoardFormDto("수정", "수정입니다.");
 
 
 		// when
-		Long updateBoardId = boardService.updateBoard(boardId, userId, boardFormDto);
+		Long updateBoardId = boardService.updateBoard(boardId, memberId, boardFormDto);
 
 
 		// then
@@ -112,13 +109,13 @@ public class BoardServiceTests {
 		// 아닐 시 false 리턴
 		
 		// given
-		Long userId = 2L;
+		Long memberId = 2L;
 		Long boardId = 2L;
 
 
 		// when
-		boolean isTruth = boardService.deleteBoard(boardId, userId);
-		boolean isFalse = boardService.deleteBoard(boardId, userId);
+		boolean isTruth = boardService.deleteBoard(boardId, memberId);
+		boolean isFalse = boardService.deleteBoard(boardId, memberId);
 
 
 		// then

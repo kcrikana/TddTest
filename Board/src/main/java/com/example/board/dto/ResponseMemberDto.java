@@ -5,7 +5,7 @@ import lombok.Getter;
 
 
 @Getter
-public class ResponseUserDto {
+public class ResponseMemberDto {
 	public Long id;
 	public String email;
 	private String password;
@@ -13,7 +13,7 @@ public class ResponseUserDto {
 	private String tel;
 
 	@Builder
-	public ResponseUserDto(Long id, String email, String password, String name, String tel) {
+	public ResponseMemberDto(Long id, String email, String password, String name, String tel) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
