@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="py-5 text-center">
+        <h2>Home Page</h2>
+        <p class="lead">Welcome to the main page.</p>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Show for Anonymous Users -->
+            <div sec:authorize="isAnonymous()" class="d-grid gap-2">
+                <a th:href="@{/members/login}" class="btn btn-primary btn-lg">로그인</a>
+            </div>
+
+            <!-- Show for Authenticated Users -->
+            <div sec:authorize="isAuthenticated()" class="d-grid gap-2">
+                <p class="text-center">
+                    <span sec:authentication="name"></span>님, 환영합니다.
+                </p>
+                <a th:href="@{/members/info}" class="btn btn-info btn-lg">사용자 정보 확인</a>
+                <form th:action="@{/logoutProc}" method="post" class="d-grid">
+                    <button type="submit" class="btn btn-secondary btn-lg">로그아웃</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
