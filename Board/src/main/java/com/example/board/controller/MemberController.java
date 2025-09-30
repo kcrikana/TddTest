@@ -22,13 +22,13 @@ public class MemberController {
 
 	private final MemberService memberService;
 
-	@PostMapping("/joinMember")
-	public ResponseEntity<Object> joinMember(@RequestBody MemberDto memberDto) {
-		memberService.join(memberDto);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
-		return new ResponseEntity<>(headers, HttpStatus.CREATED);
-	}
+//	@PostMapping("/joinMember")
+//	public ResponseEntity<Object> joinMember(@RequestBody MemberDto memberDto) {
+//		memberService.join(memberDto);
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.setContentType(new MediaType("application", "json", Charset.forName("UTF-8")));
+//		return new ResponseEntity<>(headers, HttpStatus.CREATED);
+//	}
 
 	@GetMapping("/searchMember/{memberId}")
 	public ResponseEntity<ResponseMemberDto> findMember(@PathVariable Long id) {

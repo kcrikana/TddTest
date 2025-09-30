@@ -19,19 +19,6 @@ public class MemberService {
 	// security 추가
 	private final MemberRepository memberRepository;
 
-	@Transactional
-	public Long join(MemberDto memberDto) {
-		Member member = Member.builder()
-			.name(memberDto.getName())
-			.email(memberDto.getEmail())
-			.password(memberDto.getPassword())
-			.tel(memberDto.getTel())
-			.adress(memberDto.getAdress())
-			.build();
-		memberRepository.save(member);
-		return member.getId();
-	}
-
 	public ResponseMemberDto findMemberById(Long id) {
 		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 		ResponseMemberDto responseMemberDto = ResponseMemberDto.builder()

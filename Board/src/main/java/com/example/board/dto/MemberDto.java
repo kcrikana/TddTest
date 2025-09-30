@@ -18,15 +18,27 @@ public class MemberDto {
 	private final String name;
 	@NotEmpty(message = "전화번호를 입력해주세요.")
 	private final String tel;
+
 	@NotEmpty(message = "주소를 입력해주세요.")
-	private final Adress adress;
+	private final String city;
+	@NotEmpty(message = "주소를 입력해주세요.")
+	private final String street;
+	@NotEmpty(message = "주소를 입력해주세요.")
+	private final String state;
+	@NotEmpty(message = "주소를 입력해주세요.")
+	private final String zipCode;
 
 	@Builder
-	public MemberDto(String email, String password, String name, String tel, Adress adress) {
+	public MemberDto(String email, String password, String name, String tel, String city,
+		String street,
+		String state, String zipCode) {
 		this.email = email;
 		this.password = password;
 		this.name = name;
 		this.tel = tel;
-		this.adress = adress;
+		this.city = city;
+		this.street = street;
+		this.state = state;
+		this.zipCode = zipCode;
 	}
 }
