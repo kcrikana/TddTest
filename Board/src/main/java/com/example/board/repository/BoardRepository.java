@@ -2,6 +2,7 @@ package com.example.board.repository;
 
 import com.example.board.domain.Board;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,5 +24,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
 	List<Board> findAllBoardList();
 
 	@Query("select b from Board b join fetch b.member u where b.id = :id")
-	Board findOneBoardById(Long id);
+	Optional<Board> findOneBoardById(Long id);
 }

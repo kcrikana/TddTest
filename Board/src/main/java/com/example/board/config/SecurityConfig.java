@@ -49,7 +49,7 @@ public class SecurityConfig {
 			.cors(corsCustomizer -> corsCustomizer.configurationSource(
 				request -> {
 					CorsConfiguration config = new CorsConfiguration();
-					config.setAllowedOrigins(Arrays.asList());  // TODO: 프론트 URL 추가
+					config.setAllowedOrigins(Arrays.asList("http://localhost:5173"));  // 프론트엔드 URL 허용
 					config.setAllowedMethods(Collections.singletonList("*"));
 					config.setAllowCredentials(true);
 					config.setAllowedHeaders(Collections.singletonList("*"));
@@ -59,12 +59,12 @@ public class SecurityConfig {
 			.csrf(AbstractHttpConfigurer::disable)
 			.httpBasic(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
-			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.authorizeHttpRequests(auth -> auth
-				.requestMatchers("/api/members/signup", "/api/members/login").permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-				.anyRequest().authenticated()
-			);
+			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+//			.authorizeHttpRequests(auth -> auth
+//				.requestMatchers("/api/members/signup", "/api/members/login").permitAll()
+//				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+//				.anyRequest().authenticated()
+//			);
 //			.addFilterBefore(jwtA)
 		return http.build();
 	}

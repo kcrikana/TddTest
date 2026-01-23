@@ -24,3 +24,4 @@ public class Adress {
 		this.state = state;
 		this.zipCode = zipCode;
 	}
+}

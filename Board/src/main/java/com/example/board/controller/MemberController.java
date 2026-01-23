@@ -26,6 +26,8 @@ public class MemberController {
 	// 회원 가입
 	@PostMapping("/register")
 	public ResponseEntity<Long> registerMember(@RequestBody MemberDto memberDto) {
+
+
 		return ResponseEntity.status(HttpStatus.CREATED).body(memberService.saveMember(memberDto));
 	}
 

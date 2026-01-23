@@ -23,6 +23,8 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final PasswordEncoder passwordEncoder;
 
+
+
 	@Transactional
 	public Long saveMember(MemberDto memberDto) {
 		Member member = Member.builder()
@@ -35,12 +37,16 @@ public class MemberService {
 		memberRepository.save(member);
 		return member.getId();
 	}
-	
+
+
+	@Transactional(readOnly = true)
 	public ResponseMemberDto findMemberById(Long id) {
 		Member member = memberRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
 		return new ResponseMemberDto(member);
 	}
 
+
+	@Transactional(readOnly = true)
 	public List<ResponseMemberDto> findAllMember() {
 		List<ResponseMemberDto> responseMemberDtos = new ArrayList<>();
 		for(Member member : memberRepository.findAll()) {

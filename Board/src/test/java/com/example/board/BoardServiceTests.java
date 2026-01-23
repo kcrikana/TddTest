@@ -20,9 +20,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+
+// 보드 부분 통합 테스트입니다.
 @SpringBootTest
 @Transactional
 class BoardServiceTests {
+
 
     @Autowired
     private BoardService boardService;
@@ -165,7 +168,7 @@ class BoardServiceTests {
 
     @Test
     @DisplayName("게시판 삭제 - 실패 (작성자가 다른 경우)")
-    void deleteBoard_Fail_DifferentMember() {
+    void deleteBoard_Fail_Differentember() {
         // given
         Board savedBoard = createAndSaveBoard("삭제되지 않을 제목", "삭제되지 않을 내용", member);
 
