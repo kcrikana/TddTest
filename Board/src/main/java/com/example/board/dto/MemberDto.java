@@ -10,8 +10,6 @@ import lombok.Getter;
 @Getter
 public class MemberDto {
 
-	@NotEmpty(message = "이메일을 입력해주세요.")
-	private final String email;
 	@NotEmpty(message = "비밀번호를 입력해주세요.")
 	private final String password;
 	@NotEmpty(message = "이름을 입력해주세요.")
@@ -29,10 +27,9 @@ public class MemberDto {
 	private final String zipCode;
 
 	@Builder
-	public MemberDto(String email, String password, String name, String tel, String city,
+	public MemberDto(String password, String name, String tel, String city,
 		String street,
 		String state, String zipCode) {
-		this.email = email;
 		this.password = password;
 		this.name = name;
 		this.tel = tel;

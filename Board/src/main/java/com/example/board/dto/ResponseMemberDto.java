@@ -11,7 +11,6 @@ import lombok.Getter;
 @Getter
 public class ResponseMemberDto {
 	public Long id;
-	public String email;
 	private String password;
 	public String name;
 	private String tel;
@@ -19,7 +18,6 @@ public class ResponseMemberDto {
 
 	public ResponseMemberDto(Member member) {
 		this.id = member.getId();
-		this.email = member.getEmail();
 		this.password = member.getPassword();
 		this.name = member.getName();
 		this.tel = member.getTel();
@@ -27,9 +25,8 @@ public class ResponseMemberDto {
 	}
 
 	@Builder
-	public ResponseMemberDto(Long id, String email, String password, String name, String tel, Adress adress) {
+	public ResponseMemberDto(Long id, String password, String name, String tel, Adress adress) {
 		this.id = id;
-		this.email = email;
 		this.password = password;
 		this.name = name;
 		this.tel = tel;

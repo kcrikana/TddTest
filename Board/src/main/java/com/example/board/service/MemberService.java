@@ -28,7 +28,6 @@ public class MemberService {
 	@Transactional
 	public Long saveMember(MemberDto memberDto) {
 		Member member = Member.builder()
-			.email(memberDto.getEmail())
 			.password(passwordEncoder.encode(memberDto.getPassword()))
 			.name(memberDto.getName())
 			.tel(memberDto.getTel())
@@ -59,7 +58,7 @@ public class MemberService {
 	@Transactional
 	public Long updateMember(Long memberId, MemberDto memberDto) {
 		Member member = memberRepository.findById(memberId).orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
-		member.update(memberDto.getEmail(), passwordEncoder.encode(memberDto.getPassword()), memberDto.getName());
+		member.update(passwordEncoder.encode(memberDto.getPassword()), memberDto.getName());
 		member.getAdress().updateAdress(memberDto.getCity(), memberDto.getStreet(), memberDto.getState(), member.getAdress().getZipCode());
 		return member.getId();
 	}
