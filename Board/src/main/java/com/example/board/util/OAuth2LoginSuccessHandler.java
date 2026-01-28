@@ -47,6 +47,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		// authentication.getPrincipal()은 보통 OAuth2User
 		Object principal = authentication.getPrincipal();
 		String socialId = extractKakaoId(principal);
+		String nickname = authentication.getName();
 
 		// 회원 조회 or 생성
 		Member member = memberRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, socialId)
@@ -54,8 +55,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 				Member.builder()
 					.socialType(SocialType.KAKAO)
 					.socialId(socialId)
-					.name("member")      // TODO: 카카오 프로필에서 닉네임 있으면 세팅
-					.password("OAUTH2")      // OAuth2라 의미 없는 값. (실무에선 null 처리/컬럼 분리 추천)
+					.name(nickname)      // TODO: 카카오 프로필에서 닉네임 있으면 세팅
 					.tel("000-0000-0000")    // TODO: 필요시 입력받기
 					.adress(new Adress(null, null, null, null))
 					.build()
@@ -74,8 +74,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 			cookieUtil.refreshCookie(refreshCookieName, refreshToken, refreshExpSeconds, cookieSecure).toString()
 		);
 
-		// accessToken 전달 방식: redirect query로 전달(프론트 나중에 손본다 했으니 가장 간단)
-		// ex) http://localhost:5173/oauth2/success?accessToken=...
+		// accessToken 전달 방식: redirect query로 전달
 		response.sendRedirect(redirectUri + "?accessToken=" + accessToken);
 	}
 
@@ -97,4 +96,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		throw new IllegalStateException("카카오 socialId(id) 추출 실패: OAuth2 attributes 구조를 확인해야 합니다.");
 	}
+
+
 }

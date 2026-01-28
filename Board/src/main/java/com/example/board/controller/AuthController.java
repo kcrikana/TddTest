@@ -1,10 +1,8 @@
 package com.example.board.controller;
 
-
-import com.example.board.domain.Member;
-import com.example.board.repository.MemberRepository;
+import com.example.board.dto.ReissueResult;
+import com.example.board.service.AuthService;
 import com.example.board.util.CookieUtil;
-import com.example.board.util.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
@@ -19,8 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-	private final MemberRepository memberRepository;
-	private final JwtProvider jwtProvider;
+	private final AuthService authService;
 	private final CookieUtil cookieUtil;
 
 	@Value("${jwt.refresh-cookie-name:refreshToken}")
@@ -33,39 +30,22 @@ public class AuthController {
 	private boolean cookieSecure;
 
 	@PostMapping("/refresh")
-	public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) {
+	public ResponseEntity<TokenResponse> refresh(HttpServletRequest request, HttpServletResponse response) {
 
+		// 1) 쿠키에서 refreshToken 추출
 		String refreshToken = extractCookie(request, refreshCookieName);
-		if (refreshToken == null) {
-			return ResponseEntity.status(401).body("Refresh token not found");
-		}
 
-		if (!jwtProvider.validate(refreshToken)) {
-			return ResponseEntity.status(401).body("Invalid refresh token");
-		}
+		// 2) 서비스에서 검증/회전/저장까지 처리 후 새 토큰 받기
+		ReissueResult result = authService.reissueTokens(refreshToken);
 
-		// DB에 저장된 refreshToken과 일치하는지 확인 (탈취/재사용 방어)
-		Member member = memberRepository.findByRefreshToken(refreshToken)
-			.orElse(null);
-
-		if (member == null) {
-			return ResponseEntity.status(401).body("Refresh token not matched");
-		}
-
-		// 새 토큰 발급(회전)
-		String newAccess = jwtProvider.createAccessToken(member.getId(), member.getRole());
-		String newRefresh = jwtProvider.createRefreshToken(member.getId());
-
-		member.updateRefreshToken(newRefresh);
-		memberRepository.save(member);
-
-		// 새 refresh 쿠키 세팅
-		response.addHeader(HttpHeaders.SET_COOKIE,
-			cookieUtil.refreshCookie(refreshCookieName, newRefresh, refreshExpSeconds, cookieSecure).toString()
+		// 3) 새 refreshToken을 쿠키로 세팅
+		response.addHeader(
+			HttpHeaders.SET_COOKIE,
+			cookieUtil.refreshCookie(refreshCookieName, result.refreshToken(), refreshExpSeconds, cookieSecure).toString()
 		);
 
-		// accessToken은 바디로 반환(프론트가 Authorization 헤더로 넣게)
-		return ResponseEntity.ok(new TokenResponse(newAccess));
+		// 4) accessToken은 바디로 반환
+		return ResponseEntity.ok(new TokenResponse(result.accessToken()));
 	}
 
 	private String extractCookie(HttpServletRequest request, String name) {

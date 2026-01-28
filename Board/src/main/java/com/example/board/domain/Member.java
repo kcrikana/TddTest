@@ -17,7 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Entity
 @Table(
 	uniqueConstraints = @UniqueConstraint(
@@ -27,7 +26,7 @@ import lombok.NoArgsConstructor;
 )
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Member extends BaseEntity{
+public class Member extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,17 +40,15 @@ public class Member extends BaseEntity{
 	@Column(nullable = false)
 	private String socialId;
 
-	@Column(nullable = false, unique = false)
-	private String password;
-
-	@Column(nullable = false, unique = false)
+	@Column(nullable = false)
 	private String name;
 
-	@Column(nullable = false, unique = false)
+	@Column(nullable = false)
 	private String tel;
 
 	@Enumerated(EnumType.STRING)
-	private Role role;
+	@Column(nullable = false)
+	private Role role = Role.USER;
 
 	@Embedded
 	private Adress adress;
@@ -61,25 +58,19 @@ public class Member extends BaseEntity{
 
 	@Builder
 	public Member(SocialType socialType, String socialId, String name,
-		String password, String tel, Adress adress) {
+		String tel, Adress adress) {
 		this.socialType = socialType;
 		this.socialId = socialId;
 		this.name = name;
-		this.password = password;
 		this.tel = tel;
 		this.adress = adress;
-		autorizeMember();
-	}
-
-	// 사용자 권한 수정
-	public void autorizeMember() {
 		this.role = Role.USER;
 	}
 
-
-	public void update(String password, String name) {
-		this.password = password;
+	public void updateProfile(String name, String tel, Adress adress) {
 		this.name = name;
+		this.tel = tel;
+		this.adress = adress;
 	}
 
 	public void updateRefreshToken(String refreshToken) {
@@ -89,5 +80,4 @@ public class Member extends BaseEntity{
 	public void clearRefreshToken() {
 		this.refreshToken = null;
 	}
-
 }

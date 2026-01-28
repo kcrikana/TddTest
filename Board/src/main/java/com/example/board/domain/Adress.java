@@ -19,9 +19,9 @@ public class Adress {
 	private String zipCode;
 
 	public void updateAdress(String city, String street, String state, String zipCode) {
+		this.state = state;
 		this.city = city;
 		this.street = street;
-		this.state = state;
 		this.zipCode = zipCode;
 	}
 }

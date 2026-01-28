@@ -1,7 +1,8 @@
 package com.example.board.config;
 
 
-import com.example.board.service.LoginService;
+import com.example.board.util.CustomLogoutHandler;
+import com.example.board.util.CustomLogoutSuccessHandler;
 import com.example.board.util.JwtProvider;
 import com.example.board.util.JwtTokenValidatorFilter;
 import com.example.board.util.OAuth2LoginFailureHandler;
@@ -29,24 +30,16 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-//	private final CustomLogoutHandler customLogoutHandler;
+	private final CustomLogoutHandler customLogoutHandler;
 	private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 	private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-	private final LoginService loginService;
 	private final JwtTokenValidatorFilter jwtTokenValidatorFilter;
-//	private final OncePerRequestFilter oncePerRequestFilter;
-//	private final OncePerRequestFilter adminAccessFilter;
-//	private final LogoutHandler customLogoutHandler;
+	private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
 
 	@Value("${ACCESS_URL}")
 	private String url;
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-
-	}
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http, JwtProvider jwtProvider,
@@ -59,6 +52,10 @@ public class SecurityConfig {
 			.oauth2Login(oauth2 -> oauth2
 				.successHandler(oAuth2LoginSuccessHandler)
 				.failureHandler(oAuth2LoginFailureHandler))
+			.logout(logout -> logout
+				.logoutUrl("/api/auth/logout")
+				.addLogoutHandler(customLogoutHandler)
+				.logoutSuccessHandler(customLogoutSuccessHandler))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.addFilterBefore(jwtTokenValidatorFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
 			.authorizeHttpRequests(auth -> auth
@@ -66,6 +63,8 @@ public class SecurityConfig {
 				.requestMatchers("/api/auth/refresh").permitAll()
 				.requestMatchers("/api/members/signup", "/api/members/login").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
+				.requestMatchers("/api/auth/logout").permitAll()
+				.requestMatchers("/api/auth/refresh").permitAll()
 				.anyRequest().authenticated()
 			);
 		return http.build();
