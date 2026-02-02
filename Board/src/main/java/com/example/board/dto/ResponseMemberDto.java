@@ -10,8 +10,8 @@ import lombok.Getter;
 
 @Getter
 public class ResponseMemberDto {
-	public Long id;
-	public String name;
+	private Long id;
+	private String name;
 	private String tel;
 	private Adress adress;
 

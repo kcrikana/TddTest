@@ -13,11 +13,11 @@ import org.springframework.data.jpa.repository.Query;
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
 	
-	// 페이징 처리
+	// 페이징 처리 -> 아직 사용 안함
 	@Query("select b from Board b where b.member.id = :id")
 	Page<Board> findByMemberId(Pageable pageable, Long id);
 
-	// 페이징 처리
+	// 페이징 처리 -> 아직 사용 안함
 	@Query("select b from Board b join fetch b.member")
 	Page<Board> findAll(Pageable pageable);
 

@@ -56,7 +56,6 @@ public class AuthController {
 	public ResponseEntity<ResponseMemberDto> findByInfo(Authentication authentication) {
 
 		Long memberId = (Long) authentication.getPrincipal();
-		System.out.println(authentication.getPrincipal());
 		return ResponseEntity.ok(memberService.findMemberById(memberId));
 	}
 

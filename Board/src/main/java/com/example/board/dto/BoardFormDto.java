@@ -6,10 +6,10 @@ import lombok.Getter;
 
 @Getter
 public class BoardFormDto {
-	@NotEmpty(message = "제목을 입력해주세요.")
-	String title;
-	@NotEmpty(message = "게시글을 작성해주세요.")
-	String content;
+
+	private String title;
+
+	private String content;
 
 	@Builder
 	public BoardFormDto(String title, String content) {

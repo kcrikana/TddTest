@@ -2,10 +2,15 @@ package com.example.board.service;
 
 
 import com.example.board.domain.Board;
+import com.example.board.domain.Comment;
 import com.example.board.domain.Member;
 import com.example.board.dto.BoardFormDto;
+import com.example.board.dto.CommentFormDto;
+import com.example.board.dto.ResponseBoardDetailDto;
 import com.example.board.dto.ResponseBoardDto;
+import com.example.board.dto.ResponseCommentDto;
 import com.example.board.repository.BoardRepository;
+import com.example.board.repository.CommentRepository;
 import com.example.board.repository.MemberRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +24,7 @@ public class BoardService {
 
 	private final BoardRepository boardRepository;
 	private final MemberRepository memberRepository;
+	private final CommentRepository commentRepository;
 
 	/*
 		게시판 CRUD
@@ -48,18 +54,22 @@ public class BoardService {
 		for(Board board : boardRepository.findAllBoardList()) {
 			responseBoardDtos.add(new ResponseBoardDto(board.getId(), board.getTitle(),
 				board.getContent(), board.getMember().getId()));
-			System.out.println(board.getMember().getId());
 		}
 		return responseBoardDtos;
 	}
 
 
-
-	// 한건 게시판 검색
+	// 한건 게시판 검색 및 댓글 전체 불러오기
 	@Transactional(readOnly = true)
-	public ResponseBoardDto findBoardById(Long id) {
+	public ResponseBoardDetailDto findBoardById(Long id) {
 		Board board = boardRepository.findOneBoardById(id).orElseThrow(() -> new IllegalArgumentException("게시판을 찾을 수 없습니다."));
-		return new ResponseBoardDto(board.getId(), board.getTitle(), board.getContent(), board.getMember().getId());
+		List<ResponseCommentDto> comments = new ArrayList<>();
+		for(Comment comment : commentRepository.findByBoardIdOrderByCreatedAtAsc(id)) {
+			comments.add(new ResponseCommentDto(comment.getId(), comment.getContent(), comment.getReplyId(), comment.getBoard()
+				.getId(), comment.getMember().getId()));
+
+		}
+		return new ResponseBoardDetailDto(new ResponseBoardDto(board.getId(), board.getTitle(), board.getContent(), board.getMember().getId()), comments);
 	}
 
 
@@ -80,7 +90,7 @@ public class BoardService {
 			boardRepository.deleteById(boardId);
 			return true;
 		}
-		else return false;
+		return false;
 	}
 
 }

@@ -5,6 +5,7 @@ import com.example.board.domain.Board;
 import com.example.board.domain.Member;
 import com.example.board.domain.Role;
 import com.example.board.dto.BoardFormDto;
+import com.example.board.dto.ResponseBoardDetailDto;
 import com.example.board.dto.ResponseBoardDto;
 import com.example.board.repository.BoardRepository;
 import com.example.board.repository.MemberRepository;
@@ -45,8 +46,6 @@ class BoardServiceTests {
 		Adress adress = new Adress("도시", "거리", "상세주소", "12345");
 		member = Member.builder()
 			.name("testuser")
-			.email("test@example.com")
-			.password("password")
 			.tel("010-1234-5678")
 			.adress(adress)
 			.build();
@@ -54,8 +53,6 @@ class BoardServiceTests {
 
 		anotherMember = Member.builder()
 			.name("anotheruser")
-			.email("another@example.com")
-			.password("password")
 			.tel("010-8765-4321")
 			.adress(adress)
 			.build();
@@ -81,7 +78,7 @@ class BoardServiceTests {
         Long boardId = boardService.saveBoard(member.getId(), boardFormDto);
 
         // then
-        ResponseBoardDto responseBoardDto = boardService.findBoardById(boardId);
+        ResponseBoardDto responseBoardDto = boardService.findBoardById(boardId).getResponseBoardDto();
         assertEquals(boardId, responseBoardDto.getId());
         assertEquals("테스트 제목", responseBoardDto.getTitle());
         assertEquals("테스트 내용", responseBoardDto.getContent());
@@ -94,7 +91,7 @@ class BoardServiceTests {
         Board savedBoard = createAndSaveBoard("찾을 제목", "찾을 내용", member);
 
         // when
-        ResponseBoardDto responseBoardDto = boardService.findBoardById(savedBoard.getId());
+	    ResponseBoardDto responseBoardDto = boardService.findBoardById(savedBoard.getId()).getResponseBoardDto();
 
         // then
         assertEquals(savedBoard.getId(), responseBoardDto.getId());
@@ -127,7 +124,7 @@ class BoardServiceTests {
         Long updatedBoardId = boardService.updateBoard(savedBoard.getId(), member.getId(), boardFormDto);
 
         // then
-        ResponseBoardDto responseBoardDto = boardService.findBoardById(updatedBoardId);
+        ResponseBoardDto responseBoardDto = boardService.findBoardById(updatedBoardId).getResponseBoardDto();
         assertEquals(savedBoard.getId(), updatedBoardId);
         assertEquals("수정된 제목", responseBoardDto.getTitle());
         assertEquals("수정된 내용", responseBoardDto.getContent());
@@ -144,7 +141,7 @@ class BoardServiceTests {
         boardService.updateBoard(savedBoard.getId(), anotherMember.getId(), boardFormDto);
 
         // then
-        ResponseBoardDto responseBoardDto = boardService.findBoardById(savedBoard.getId());
+        ResponseBoardDto responseBoardDto = boardService.findBoardById(savedBoard.getId()).getResponseBoardDto();
         assertEquals("원본 제목", responseBoardDto.getTitle()); // 제목이 변경되지 않았는지 확인
         assertEquals("원본 내용", responseBoardDto.getContent()); // 내용이 변경되지 않았는지 확인
     }

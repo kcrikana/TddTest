@@ -51,10 +51,6 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 		String socialId = extractKakaoId(oAuth2User);
 		String nickname = extractKakaoNickname(attributes);
 
-
-		System.out.println(socialId);
-		System.out.println(authentication.getPrincipal());
-		System.out.println(authentication.getName());
 		// 회원 조회 or 생성
 		Member member = memberRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, socialId)
 			.orElseGet(() -> memberRepository.save(
