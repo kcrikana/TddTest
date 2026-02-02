@@ -60,11 +60,15 @@ public class SecurityConfig {
 			.addFilterBefore(jwtTokenValidatorFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/oauth2/**", "/login/oauth2/**", "/error").permitAll()
+				.requestMatchers(HttpMethod.GET, "/board/**").permitAll()
 				.requestMatchers("/api/auth/refresh").permitAll()
 				.requestMatchers("/api/members/signup", "/api/members/login").permitAll()
-				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
 				.requestMatchers("/api/auth/logout").permitAll()
 				.requestMatchers("/api/auth/refresh").permitAll()
+
+				.requestMatchers(HttpMethod.POST, "/board/**").authenticated()
+				.requestMatchers(HttpMethod.PUT, "/board/**").authenticated()
+				.requestMatchers(HttpMethod.DELETE, "/board/**").authenticated()
 				.anyRequest().authenticated()
 			);
 		return http.build();

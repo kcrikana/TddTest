@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,13 +23,9 @@ public class BoardController {
 
     private final BoardService boardService;
 
-    // 게시글 저장
-    @PostMapping("/board")
-    public ResponseEntity<Long> saveBoard(@RequestHeader("Authorization") Long memberId, @RequestBody BoardFormDto boardFormDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(boardService.saveBoard(memberId, boardFormDto));
-    }
 
-    // 모든 게시글 조회
+
+	// 모든 게시글 조회
     @GetMapping("/board")
     public ResponseEntity<List<ResponseBoardDto>> findAllBoard() {
         return ResponseEntity.ok(boardService.findBoardAll());
@@ -40,15 +37,32 @@ public class BoardController {
         return ResponseEntity.ok(boardService.findBoardById(boardId));
     }
 
-    // 게시글 수정
-    @PutMapping("/board/{boardId}")
-    public ResponseEntity<Long> updateBoard(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") Long memberId, @RequestBody BoardFormDto boardFormDto) {
-        return ResponseEntity.ok(boardService.updateBoard(boardId, memberId, boardFormDto));
+
+	// 게시글 저장
+    @PostMapping("/board")
+    public ResponseEntity<Long> saveBoard(Authentication authentication, @RequestBody BoardFormDto dto) {
+	    Long memberId = (Long) authentication.getPrincipal();
+	    return ResponseEntity.status(HttpStatus.CREATED).body(boardService.saveBoard(memberId, dto));
     }
 
-    // 게시글 삭제
-    @DeleteMapping("/board/{boardId}")
-    public ResponseEntity<Boolean> deleteBoard(@PathVariable("boardId") Long boardId, @RequestHeader("Authorization") Long memberId) {
-        return ResponseEntity.ok(boardService.deleteBoard(boardId, memberId));
-    }
+	// 게시글 수정
+	@PutMapping("/board/{boardId}")
+	public ResponseEntity<Long> updateBoard(
+		Authentication authentication,
+		@PathVariable("boardId") Long boardId,
+		@RequestBody BoardFormDto boardFormDto
+	) {
+		Long memberId = (Long) authentication.getPrincipal();
+		return ResponseEntity.ok(boardService.updateBoard(boardId, memberId, boardFormDto));
+	}
+
+	// 게시글 삭제
+	@DeleteMapping("/board/{boardId}")
+	public ResponseEntity<Boolean> deleteBoard(
+		Authentication authentication,
+		@PathVariable("boardId") Long boardId
+	) {
+		Long memberId = (Long) authentication.getPrincipal();
+		return ResponseEntity.ok(boardService.deleteBoard(boardId, memberId));
+	}
 }

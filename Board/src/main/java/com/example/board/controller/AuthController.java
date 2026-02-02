@@ -1,7 +1,9 @@
 package com.example.board.controller;
 
 import com.example.board.dto.ReissueResult;
+import com.example.board.dto.ResponseMemberDto;
 import com.example.board.service.AuthService;
+import com.example.board.service.MemberService;
 import com.example.board.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +22,7 @@ public class AuthController {
 
 	private final AuthService authService;
 	private final CookieUtil cookieUtil;
+	private final MemberService memberService;
 
 	@Value("${jwt.refresh-cookie-name:refreshToken}")
 	private String refreshCookieName;
@@ -46,6 +50,14 @@ public class AuthController {
 
 		// 4) accessToken은 바디로 반환
 		return ResponseEntity.ok(new TokenResponse(result.accessToken()));
+	}
+
+	@GetMapping("/me")
+	public ResponseEntity<ResponseMemberDto> findByInfo(Authentication authentication) {
+
+		Long memberId = (Long) authentication.getPrincipal();
+		System.out.println(authentication.getPrincipal());
+		return ResponseEntity.ok(memberService.findMemberById(memberId));
 	}
 
 	private String extractCookie(HttpServletRequest request, String name) {

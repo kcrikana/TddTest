@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -45,18 +46,23 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		// OAuth2User attributes에서 socialId 추출
 		// authentication.getPrincipal()은 보통 OAuth2User
-		Object principal = authentication.getPrincipal();
-		String socialId = extractKakaoId(principal);
-		String nickname = authentication.getName();
+		OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+		Map<String, Object> attributes = oAuth2User.getAttributes();
+		String socialId = extractKakaoId(oAuth2User);
+		String nickname = extractKakaoNickname(attributes);
 
+
+		System.out.println(socialId);
+		System.out.println(authentication.getPrincipal());
+		System.out.println(authentication.getName());
 		// 회원 조회 or 생성
 		Member member = memberRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, socialId)
 			.orElseGet(() -> memberRepository.save(
 				Member.builder()
 					.socialType(SocialType.KAKAO)
 					.socialId(socialId)
-					.name(nickname)      // TODO: 카카오 프로필에서 닉네임 있으면 세팅
-					.tel("000-0000-0000")    // TODO: 필요시 입력받기
+					.name(nickname)
+					.tel("010-0000-0000")
 					.adress(new Adress(null, null, null, null))
 					.build()
 			));
@@ -79,7 +85,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 	}
 
 	@SuppressWarnings("unchecked")
-	private String extractKakaoId(Object principal) {
+	private String extractKakaoId(OAuth2User principal) {
 		// 기본 구현: OAuth2User -> attributes(Map)에서 id
 		// 런타임 캐스팅 실패할 수 있으니 방어적으로 처리
 		try {
@@ -96,6 +102,20 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
 		throw new IllegalStateException("카카오 socialId(id) 추출 실패: OAuth2 attributes 구조를 확인해야 합니다.");
 	}
+
+	private String extractKakaoNickname(Map<String, Object> attributes) {
+		Object kakaoAccount = attributes.get("kakao_account");
+
+		if (kakaoAccount instanceof Map<?, ?> accountMap) {
+			Object profile = accountMap.get("profile");
+			if (profile instanceof Map<?, ?> profileMap) {
+				Object nickname = profileMap.get("nickname");
+				return (String) nickname;
+			}
+		}
+		return "카카오유저";
+	}
+
 
 
 }

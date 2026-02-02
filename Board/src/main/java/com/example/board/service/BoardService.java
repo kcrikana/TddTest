@@ -47,7 +47,8 @@ public class BoardService {
 		List<ResponseBoardDto> responseBoardDtos = new ArrayList<>();
 		for(Board board : boardRepository.findAllBoardList()) {
 			responseBoardDtos.add(new ResponseBoardDto(board.getId(), board.getTitle(),
-				board.getContent()));
+				board.getContent(), board.getMember().getId()));
+			System.out.println(board.getMember().getId());
 		}
 		return responseBoardDtos;
 	}
@@ -58,7 +59,7 @@ public class BoardService {
 	@Transactional(readOnly = true)
 	public ResponseBoardDto findBoardById(Long id) {
 		Board board = boardRepository.findOneBoardById(id).orElseThrow(() -> new IllegalArgumentException("게시판을 찾을 수 없습니다."));
-		return new ResponseBoardDto(board.getId(), board.getTitle(), board.getContent());
+		return new ResponseBoardDto(board.getId(), board.getTitle(), board.getContent(), board.getMember().getId());
 	}
 
 
