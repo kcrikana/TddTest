@@ -1,128 +1,182 @@
 package com.example.board;
 
-
+import com.example.board.domain.Adress;
+import com.example.board.domain.Board;
+import com.example.board.domain.Member;
+import com.example.board.domain.Role;
 import com.example.board.dto.BoardFormDto;
 import com.example.board.dto.ResponseBoardDto;
 import com.example.board.repository.BoardRepository;
+import com.example.board.repository.MemberRepository;
 import com.example.board.service.BoardService;
-import com.example.board.service.MemberService;
-import java.util.List;
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+
+// 보드 부분 통합 테스트입니다.
 @SpringBootTest
-public class BoardServiceTests {
-
-	@Autowired
-	private BoardService boardService;
-
-	@Autowired
-	private MemberService memberService;
-
-	@Autowired
-	private BoardRepository boardRepository;
-
-	@Test
-	@DisplayName("게시판 글 작성")
-	public void createBoard() throws Exception {
-
-		// given
-		BoardFormDto boardFormDto = new BoardFormDto("테스트", "이제 되나?");
-
-		// when
-		Long boardId = boardService.saveBoard(1L, boardFormDto);
+@Transactional
+class BoardServiceTests {
 
 
-		//then
-		ResponseBoardDto responseBoardDto = boardService.findBoardById(boardId);
-		Assertions.assertEquals(responseBoardDto.getId(), boardId);
-		Assertions.assertEquals(responseBoardDto.getTitle(), "테스트");
-		Assertions.assertEquals(responseBoardDto.getContent(), "이제 되나?");
+    @Autowired
+    private BoardService boardService;
 
+    @Autowired
+    private BoardRepository boardRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
+
+    private Member member;
+    private Member anotherMember;
+
+	@BeforeEach
+	void setUp() {
+		// Adress 생성자를 올바르게 수정했습니다.
+		Adress adress = new Adress("도시", "거리", "상세주소", "12345");
+		member = Member.builder()
+			.name("testuser")
+			.email("test@example.com")
+			.password("password")
+			.tel("010-1234-5678")
+			.adress(adress)
+			.build();
+		memberRepository.save(member);
+
+		anotherMember = Member.builder()
+			.name("anotheruser")
+			.email("another@example.com")
+			.password("password")
+			.tel("010-8765-4321")
+			.adress(adress)
+			.build();
+		memberRepository.save(anotherMember);
 	}
 
-	@Test
-	@DisplayName("게시판 한 건 불러오기")
-	public void findByIdBoard() throws Exception {
+    private Board createAndSaveBoard(String title, String content, Member boardMember) {
+        Board board = Board.builder()
+                .title(title)
+                .content(content)
+                .member(boardMember)
+                .build();
+        return boardRepository.save(board);
+    }
 
-		// given
-		Long boardId = 1L;
+    @Test
+    @DisplayName("게시판 글 작성")
+    void createBoard() {
+        // given
+        BoardFormDto boardFormDto = new BoardFormDto("테스트 제목", "테스트 내용");
 
-		// when
-		ResponseBoardDto responseBoardDto = boardService.findBoardById(boardId);
+        // when
+        Long boardId = boardService.saveBoard(member.getId(), boardFormDto);
 
-		//then
-		Assertions.assertEquals(responseBoardDto.getId(), boardId);
-		Assertions.assertEquals(responseBoardDto.getTitle(), "테스트");
-		Assertions.assertEquals(responseBoardDto.getContent(), "테스트입니다.");
-	}
+        // then
+        ResponseBoardDto responseBoardDto = boardService.findBoardById(boardId);
+        assertEquals(boardId, responseBoardDto.getId());
+        assertEquals("테스트 제목", responseBoardDto.getTitle());
+        assertEquals("테스트 내용", responseBoardDto.getContent());
+    }
+
+    @Test
+    @DisplayName("게시판 한 건 불러오기")
+    void findByIdBoard() {
+        // given
+        Board savedBoard = createAndSaveBoard("찾을 제목", "찾을 내용", member);
+
+        // when
+        ResponseBoardDto responseBoardDto = boardService.findBoardById(savedBoard.getId());
+
+        // then
+        assertEquals(savedBoard.getId(), responseBoardDto.getId());
+        assertEquals("찾을 제목", responseBoardDto.getTitle());
+        assertEquals("찾을 내용", responseBoardDto.getContent());
+    }
+
+    @Test
+    @DisplayName("게시판 전체 불러오기")
+    void findAllBoard() {
+        // given
+        createAndSaveBoard("제목 1", "내용 1", member);
+        createAndSaveBoard("제목 2", "내용 2", member);
+
+        // when
+        List<ResponseBoardDto> responseBoardDtos = boardService.findBoardAll();
+
+        // then
+        assertEquals(2, responseBoardDtos.size());
+    }
+
+    @Test
+    @DisplayName("게시판 수정 - 성공")
+    void updateBoard_Success() {
+        // given
+        Board savedBoard = createAndSaveBoard("원본 제목", "원본 내용", member);
+        BoardFormDto boardFormDto = new BoardFormDto("수정된 제목", "수정된 내용");
+
+        // when
+        Long updatedBoardId = boardService.updateBoard(savedBoard.getId(), member.getId(), boardFormDto);
+
+        // then
+        ResponseBoardDto responseBoardDto = boardService.findBoardById(updatedBoardId);
+        assertEquals(savedBoard.getId(), updatedBoardId);
+        assertEquals("수정된 제목", responseBoardDto.getTitle());
+        assertEquals("수정된 내용", responseBoardDto.getContent());
+    }
+
+    @Test
+    @DisplayName("게시판 수정 - 실패 (작성자가 다른 경우)")
+    void updateBoard_Fail_DifferentMember() {
+        // given
+        Board savedBoard = createAndSaveBoard("원본 제목", "원본 내용", member);
+        BoardFormDto boardFormDto = new BoardFormDto("수정된 제목", "수정된 내용");
+
+        // when
+        boardService.updateBoard(savedBoard.getId(), anotherMember.getId(), boardFormDto);
+
+        // then
+        ResponseBoardDto responseBoardDto = boardService.findBoardById(savedBoard.getId());
+        assertEquals("원본 제목", responseBoardDto.getTitle()); // 제목이 변경되지 않았는지 확인
+        assertEquals("원본 내용", responseBoardDto.getContent()); // 내용이 변경되지 않았는지 확인
+    }
 
 
-	@Test
-	@DisplayName("게시판 전체 불러오기")
-	public void findAllBoard() throws Exception {
+    @Test
+    @DisplayName("게시판 삭제 - 성공")
+    void deleteBoard_Success() {
+        // given
+        Board savedBoard = createAndSaveBoard("삭제할 제목", "삭제할 내용", member);
 
-		// given
+        // when
+        boolean result = boardService.deleteBoard(savedBoard.getId(), member.getId());
 
+        // then
+        assertTrue(result);
+        assertThrows(IllegalArgumentException.class, () -> {
+            boardService.findBoardById(savedBoard.getId());
+        });
+    }
 
-		// when
+    @Test
+    @DisplayName("게시판 삭제 - 실패 (작성자가 다른 경우)")
+    void deleteBoard_Fail_Differentember() {
+        // given
+        Board savedBoard = createAndSaveBoard("삭제되지 않을 제목", "삭제되지 않을 내용", member);
 
-		List<ResponseBoardDto> responseBoardDtos = boardService.findBoardAll();
+        // when
+        boolean result = boardService.deleteBoard(savedBoard.getId(), anotherMember.getId());
 
-		//then
-		Assertions.assertEquals(responseBoardDtos.size(), 4);
-		Assertions.assertEquals(responseBoardDtos.size(), 4);
-
-	}
-
-	@Test
-	@DisplayName("게시판 수정")
-	public void updateBoard() throws Exception {
-		// 유저 아이디 일치 시에만 변경
-		
-		// given
-		Long memberId = 1L;
-		Long boardId = 4L;
-		BoardFormDto boardFormDto = new BoardFormDto("수정", "수정입니다.");
-
-
-		// when
-		Long updateBoardId = boardService.updateBoard(boardId, memberId, boardFormDto);
-
-
-		// then
-		ResponseBoardDto responseBoardDto = boardService.findBoardById(boardId);
-		Assertions.assertEquals(updateBoardId, boardId);
-		Assertions.assertEquals(responseBoardDto.getTitle(), "수정");
-		Assertions.assertEquals(responseBoardDto.getContent(), "수정입니다.");
-
-	}
-
-
-	@Test
-	@DisplayName("게시판 삭제")
-	public void deleteBoard() throws Exception {
-		// 유저 아이디 일치 시 삭제 후 true 리턴
-		// 아닐 시 false 리턴
-		
-		// given
-		Long memberId = 2L;
-		Long boardId = 2L;
-
-
-		// when
-		boolean isTruth = boardService.deleteBoard(boardId, memberId);
-		boolean isFalse = boardService.deleteBoard(boardId, memberId);
-
-
-		// then
-
-		Assertions.assertEquals(isTruth, true);
-		Assertions.assertEquals(isFalse, false);
-
-	}
-
+        // then
+        assertFalse(result);
+        assertNotNull(boardRepository.findById(savedBoard.getId()));
+    }
 }

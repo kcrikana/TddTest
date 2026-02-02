@@ -1,5 +1,6 @@
 package com.example.board.dto;
 
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,10 +13,14 @@ public class ResponseBoardDto {
 
 	private String content;
 
+	private Long writerId;
+
+
 	@Builder
-	public ResponseBoardDto(Long id, String title, String content) {
+	public ResponseBoardDto(Long id, String title, String content, Long writerId) {
 		this.id = id;
 		this.title = title;
 		this.content = content;
+		this.writerId = writerId;
 	}
 }
